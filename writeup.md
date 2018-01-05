@@ -95,7 +95,7 @@ With these parameters I am able to achieve accuracy of around 99.5% on the test 
 
 #### 1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 
-I decided to divide the whole search space in three main region. The Upper Region where the car appears small and normally not too much rectangular in shape. The Second Right Region where car appears bigger and often rectangular in shape. The last region take care of lower right region where car apears bigger in shape and again square shaped window will detect the car.
+I decided to divide the whole search space in three main region. The Upper Region where the car appears small and normally not too much rectangular in shape. The Second Right Region where car appears bigger and often rectangular in shape. The last region takes care of lower right region where car apears bigger in shape and again square shaped window will detect the car.
 
 The detail of regions, window sizes for that region and search area is defined below:
 
@@ -122,17 +122,17 @@ For reference the complete search space somehow looks like this
 
 #### 2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
-First of all for each window size, window space has been defined and following pipeline has been defined for finding cars in images:
-Step 1 : Cropped the image based on the search area defined for one particular window
-Step 2 : Conversion the cropped image into HLS space
-Step 3 : Scale the whole cropped image to account for variation if the window size is different from 64 x 64
-Step 4 : Calculate HOG features on complete L-channel once
-Step 5 : Sliding the window on the entire cropped scaled image
-  Step 5.1 : Extract HOG for this patch from the one calculated above
-  Step 5.2 : Calculate color histogram on S-channel and H-channel patches
-  Step 5.3 : Concatenate the features to one feature vector
-  Step 5.4 : Scale features
-  Step 5.5 : Make a prediction
+First of all for each window size, window space has been defined and following pipeline has been used for finding cars in images:
+- Step 1 : Cropped the image based on the search area defined for one particular window
+- Step 2 : Convert the cropped image into HLS color space
+- Step 3 : Scale the whole cropped image to account for variation if the window size is different from 64 x 64
+- Step 4 : Calculate HOG features on complete L-channel once
+- Step 5 : Sliding the window on the entire cropped scaled image
+-   Step 5.1 : Extract HOG for this patch from the one calculated above
+-   Step 5.2 : Calculate color histogram on S-channel and H-channel patches
+-   Step 5.3 : Concatenate the features to one feature vector
+-   Step 5.4 : Scale features
+-   Step 5.5 : Make a prediction
 
 Code is shown in the function `find_cars(...)` function.
 
@@ -158,9 +158,9 @@ Here's a [link to my video result][video1]
 
 I have defined vehicle object to record result from the N previous frames and make decision for the current frame. This helps not only rejecting false positive in each frame but also predict the location of car if in some frames no car is detected (true negative).
 
-After applying threshold based filtering based on heatmap on each frame, the heatmap of N consecutive frames are combined. Then thresholded N-Frames combined heatmap to identify vehicle positions. I used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  Based on the assumption that each blob corresponded to a vehicle, bounding boxes have been constructed to cover the area of each blob detected.
+After applying threshold based filtering based on heatmap on each frame, the heatmap of N consecutive frames are combined. Then another thresholding is applied on N-Frames combined heatmap image to identify vehicles position. I used `scipy.ndimage.measurements.label()` to identify individual blobs in the combined heatmap.  Based on the assumption that each blob corresponded to a vehicle, bounding boxes have been constructed to cover the area of each blob detected.
 
-Very few false positive results have also been rejected by using the aspect ratio check (height/width). All blobs with aspect ratio more that 2.5 are also rejected.
+Very few false positive results have also been discarded by using the aspect ratio (height/width) check. All blobs with aspect ratio more that 2.5 are also rejected.
 
 ### Here are first six frames and their corresponding heatmaps:
 
@@ -182,7 +182,7 @@ Very few false positive results have also been rejected by using the aspect rati
 
 Most of the time is spent in feature extraction phase. I tried different color spaces (YUV, HSL) and feature extraction mechanism to make the classifier color invariant and size invariant as much as possible. Tunning the HOG parameters was also challenging so that it can generalize better. For the selection of the classifier I focused on SVM mainly and challenge was to choose appropriate parameters for that.
 
-In extreme light variations, HOG on L-channel can have influence where shape of the objects cannot be identified clearly, but color histogram on S-channel can serve as counter measure to this problem to some extent. As in the complete feature vector HOG features dominate so this can effect the whole pipeline.
+In extreme light variations, HOG on L-channel can have influence where shape of the objects cannot be identified clearly, but color histogram on S-channel can serve as a counter measure to this problem to some extent. As in the complete feature vector HOG features dominate so this can effect the whole pipeline.
 
 The classification result of 99.5% also seems extremely good but depending upon the dataset, how much the dataset used to generalize all possible combination also has an impact.
 
